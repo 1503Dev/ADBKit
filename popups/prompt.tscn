@@ -1,0 +1,74 @@
+[gd_scene load_steps=3 format=3 uid="uid://bnlq5fjg2uj7y"]
+
+[ext_resource type="Script" uid="uid://b2rn1g7o7ndy" path="res://popups/prompt.gd" id="1_w6hi4"]
+[ext_resource type="Theme" uid="uid://qthfj4bhjtkp" path="res://theme.tres" id="2_s05b4"]
+
+[node name="Prompt" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_w6hi4")
+metadata/_edit_lock_ = true
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_force_pass_scroll_events = false
+color = Color(0, 0, 0, 0.282353)
+metadata/_edit_lock_ = true
+
+[node name="Window" type="Window" parent="."]
+auto_translate_mode = 1
+initial_position = 1
+size = Vector2i(400, 184)
+exclusive = true
+unresizable = true
+min_size = Vector2i(400, 184)
+max_size = Vector2i(400, 184)
+keep_title_visible = true
+theme = ExtResource("2_s05b4")
+
+[node name="TextEdit" type="TextEdit" parent="Window"]
+offset_left = 16.0
+offset_top = 64.0
+offset_right = 384.0
+offset_bottom = 112.0
+theme = ExtResource("2_s05b4")
+autowrap_mode = 1
+
+[node name="Label" type="Label" parent="Window"]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 104.0
+offset_bottom = 47.0
+theme = ExtResource("2_s05b4")
+text = "输入文字"
+
+[node name="Button_Cancel" type="Button" parent="Window"]
+offset_left = 184.0
+offset_top = 128.0
+offset_right = 280.0
+offset_bottom = 168.0
+theme = ExtResource("2_s05b4")
+theme_override_font_sizes/font_size = 20
+text = "取消"
+
+[node name="Button_OK" type="Button" parent="Window"]
+offset_left = 288.0
+offset_top = 128.0
+offset_right = 384.0
+offset_bottom = 168.0
+theme = ExtResource("2_s05b4")
+theme_override_font_sizes/font_size = 20
+text = "提交"
+
+[connection signal="close_requested" from="Window" to="." method="_on_window_close_requested"]
+[connection signal="pressed" from="Window/Button_Cancel" to="." method="_on_button_cancel_pressed"]
+[connection signal="pressed" from="Window/Button_OK" to="." method="_on_button_ok_pressed"]

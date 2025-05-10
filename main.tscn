@@ -1,0 +1,471 @@
+[gd_scene load_steps=11 format=3 uid="uid://dwnh26t8ccxug"]
+
+[ext_resource type="Script" uid="uid://bfi7dorxcquvs" path="res://main.gd" id="1_ig7tw"]
+[ext_resource type="Theme" uid="uid://qthfj4bhjtkp" path="res://theme.tres" id="2_0xm2m"]
+[ext_resource type="FontFile" uid="uid://bvq7ykurr2ydp" path="res://fonts/consola.ttf" id="3_h2yge"]
+
+[sub_resource type="Shader" id="Shader_ig7tw"]
+code = "// 修改后的着色器（添加透明度支持）
+shader_type canvas_item;
+uniform sampler2D SCREEN_TEXTURE : hint_screen_texture;
+
+uniform float blur_radius : hint_range(1, 10) = 3.0;
+uniform float opacity : hint_range(0, 1) = 0.8;
+
+void fragment() {
+    vec2 uv = SCREEN_UV;
+    vec2 pixel_size = vec2(1.0) / SCREEN_PIXEL_SIZE * blur_radius * 0.01;
+    
+    vec4 blur = texture(SCREEN_TEXTURE, uv) * 0.18;
+    blur += texture(SCREEN_TEXTURE, uv + vec2(1, 0) * pixel_size) * 0.15;
+    blur += texture(SCREEN_TEXTURE, uv + vec2(-1, 0) * pixel_size) * 0.15;
+    // [...] 其他采样（保持和之前相同）
+    
+    COLOR = blur;
+    COLOR.a = opacity;  // 关键：允许背景透出
+}"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_h2yge"]
+shader = SubResource("Shader_ig7tw")
+shader_parameter/blur_radius = 3.0
+shader_parameter/opacity = 0.8
+
+[sub_resource type="CodeHighlighter" id="CodeHighlighter_0xm2m"]
+number_color = Color(0.497766, 0.945313, 0.773287, 1)
+symbol_color = Color(0.701563, 0.969224, 1, 1)
+function_color = Color(0.384841, 0.674607, 0.870313, 1)
+member_variable_color = Color(0.701961, 0.968627, 1, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_1bvp3"]
+font = ExtResource("3_h2yge")
+font_size = 24
+
+[sub_resource type="LabelSettings" id="LabelSettings_h2yge"]
+font = ExtResource("3_h2yge")
+font_size = 22
+
+[sub_resource type="CodeHighlighter" id="CodeHighlighter_h2yge"]
+number_color = Color(0.497766, 0.945313, 0.773287, 1)
+symbol_color = Color(0.701563, 0.969224, 1, 1)
+function_color = Color(0.384841, 0.674607, 0.870313, 1)
+member_variable_color = Color(0.701961, 0.968627, 1, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_0xm2m"]
+font_size = 32
+
+[node name="Main" type="Control"]
+material = SubResource("ShaderMaterial_h2yge")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ig7tw")
+metadata/_edit_lock_ = true
+
+[node name="Background" type="ColorRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.784314)
+metadata/_edit_lock_ = true
+metadata/_edit_group_ = true
+
+[node name="MenuBar" type="MenuBar" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 36.0
+grow_horizontal = 2
+theme = ExtResource("2_0xm2m")
+start_index = 0
+
+[node name="选项" type="PopupMenu" parent="MenuBar"]
+item_count = 1
+item_0/text = "  关于  "
+item_0/id = 0
+
+[node name="Label_CommandOutputs" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -281.0
+offset_right = 60.0
+offset_bottom = -250.0
+grow_vertical = 0
+theme = ExtResource("2_0xm2m")
+text = "输出"
+
+[node name="CommandOutputs" type="CodeEdit" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -236.0
+grow_horizontal = 2
+grow_vertical = 0
+theme = ExtResource("2_0xm2m")
+theme_override_constants/line_spacing = -1
+text = "00:00:00.001 > ADBKit
+Made by 1503Dev"
+editable = false
+emoji_menu_enabled = false
+drag_and_drop_selection_enabled = false
+middle_mouse_paste_enabled = false
+autowrap_mode = 1
+caret_type = 1
+use_default_word_separators = false
+syntax_highlighter = SubResource("CodeHighlighter_0xm2m")
+
+[node name="Label_ItemList_Devices" type="Label" parent="."]
+layout_mode = 1
+offset_left = 16.0
+offset_top = 56.0
+offset_right = 104.0
+offset_bottom = 87.0
+theme = ExtResource("2_0xm2m")
+text = "设备列表"
+
+[node name="Button_ConnectDevice" type="Button" parent="Label_ItemList_Devices"]
+layout_mode = 0
+offset_left = 144.0
+offset_top = -4.0
+offset_right = 232.0
+offset_bottom = 36.0
+theme_override_font_sizes/font_size = 18
+text = "连接"
+
+[node name="Button_RefreshDevices" type="Button" parent="Label_ItemList_Devices"]
+layout_mode = 0
+offset_left = 232.0
+offset_top = -4.0
+offset_right = 320.0
+offset_bottom = 36.0
+theme_override_font_sizes/font_size = 18
+text = "刷新"
+
+[node name="ItemList_Devices" type="ItemList" parent="."]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 104.0
+offset_right = 336.0
+offset_bottom = -296.0
+grow_vertical = 2
+theme = ExtResource("2_0xm2m")
+
+[node name="Timers" type="Node" parent="."]
+
+[node name="Timer_RefreshDevices" type="Timer" parent="Timers"]
+wait_time = 5.0
+autostart = true
+
+[node name="Tabs" type="Node" parent="."]
+
+[node name="TabContainer" type="TabContainer" parent="Tabs"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 352.0
+offset_top = 52.0
+offset_right = -16.0
+offset_bottom = -296.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_0xm2m")
+current_tab = 1
+metadata/_edit_lock_ = true
+
+[node name="仪表板" type="Panel" parent="Tabs/TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 0
+metadata/_edit_lock_ = true
+
+[node name="Label_For_DeviceName" type="Label" parent="Tabs/TabContainer/仪表板"]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 40.0
+offset_right = 106.0
+offset_bottom = 71.0
+text = "设备型号"
+
+[node name="Label_DeviceName" type="Label" parent="Tabs/TabContainer/仪表板/Label_For_DeviceName"]
+layout_mode = 0
+offset_left = 104.0
+offset_right = 249.0
+offset_bottom = 31.0
+text = "DEVICE_NAME"
+label_settings = SubResource("LabelSettings_1bvp3")
+
+[node name="Label_For_DiskInfo" type="Label" parent="Tabs/TabContainer/仪表板"]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 80.0
+offset_right = 106.0
+offset_bottom = 111.0
+text = "内部储存"
+
+[node name="Label_DiskInfo" type="Label" parent="Tabs/TabContainer/仪表板/Label_For_DiskInfo"]
+layout_mode = 0
+offset_left = 104.0
+offset_right = 249.0
+offset_bottom = 31.0
+text = "DISK_INFO"
+label_settings = SubResource("LabelSettings_1bvp3")
+
+[node name="ProgressBar_DiskSpace" type="ProgressBar" parent="Tabs/TabContainer/仪表板/Label_For_DiskInfo"]
+layout_mode = 0
+offset_left = 104.0
+offset_top = 40.0
+offset_right = 1056.0
+offset_bottom = 67.0
+step = 1.0
+rounded = true
+
+[node name="Label_For_CPUArch" type="Label" parent="Tabs/TabContainer/仪表板"]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 288.0
+offset_right = 128.0
+offset_bottom = 319.0
+text = "CPU架构"
+
+[node name="Label_CPUArch" type="Label" parent="Tabs/TabContainer/仪表板/Label_For_CPUArch"]
+layout_mode = 0
+offset_left = 104.0
+offset_right = 249.0
+offset_bottom = 31.0
+text = "CPU_ARCH"
+label_settings = SubResource("LabelSettings_1bvp3")
+
+[node name="Label_For_CPUModel" type="Label" parent="Tabs/TabContainer/仪表板"]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 328.0
+offset_right = 128.0
+offset_bottom = 359.0
+text = "CPU型号"
+
+[node name="Label_CPUModel" type="Label" parent="Tabs/TabContainer/仪表板/Label_For_CPUModel"]
+layout_mode = 0
+offset_left = 104.0
+offset_right = 249.0
+offset_bottom = 31.0
+text = "CPU_MODEL"
+label_settings = SubResource("LabelSettings_1bvp3")
+
+[node name="Label_For_ScreenInfo" type="Label" parent="Tabs/TabContainer/仪表板"]
+visible = false
+layout_mode = 0
+offset_left = 560.0
+offset_top = 160.0
+offset_right = 648.0
+offset_bottom = 191.0
+text = "分辨率"
+
+[node name="Label_ScreenInfo" type="Label" parent="Tabs/TabContainer/仪表板/Label_For_ScreenInfo"]
+layout_mode = 0
+offset_left = 104.0
+offset_right = 249.0
+offset_bottom = 31.0
+text = "SCREEN_INFO"
+label_settings = SubResource("LabelSettings_1bvp3")
+
+[node name="Label_For_AndroidVersion" type="Label" parent="Tabs/TabContainer/仪表板"]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 168.0
+offset_right = 128.0
+offset_bottom = 199.0
+text = "安卓版本"
+
+[node name="Label_AndroidVersion" type="Label" parent="Tabs/TabContainer/仪表板/Label_For_AndroidVersion"]
+layout_mode = 0
+offset_left = 104.0
+offset_right = 249.0
+offset_bottom = 31.0
+text = "ANDROID_VERSION"
+label_settings = SubResource("LabelSettings_1bvp3")
+
+[node name="Label_For_OSVersion" type="Label" parent="Tabs/TabContainer/仪表板"]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 208.0
+offset_right = 128.0
+offset_bottom = 239.0
+text = "系统版本"
+
+[node name="Label_OSVersion" type="Label" parent="Tabs/TabContainer/仪表板/Label_For_OSVersion"]
+layout_mode = 0
+offset_left = 104.0
+offset_right = 249.0
+offset_bottom = 31.0
+text = "OS_VERSION"
+label_settings = SubResource("LabelSettings_1bvp3")
+
+[node name="Label_For_BuildFingerprint" type="Label" parent="Tabs/TabContainer/仪表板"]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 248.0
+offset_right = 128.0
+offset_bottom = 279.0
+text = "构建指纹"
+
+[node name="Label_BuildFingerprint" type="Label" parent="Tabs/TabContainer/仪表板/Label_For_BuildFingerprint"]
+layout_mode = 0
+offset_left = 104.0
+offset_top = 3.0
+offset_right = 310.0
+offset_bottom = 34.0
+text = "BUILD_FINGERPRINT"
+label_settings = SubResource("LabelSettings_h2yge")
+
+[node name="软件管理" type="Panel" parent="Tabs/TabContainer"]
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="Label" type="Label" parent="Tabs/TabContainer/软件管理"]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 44.0
+offset_right = 128.0
+offset_bottom = 75.0
+text = "软件列表"
+
+[node name="Button_RefreshApps" type="Button" parent="Tabs/TabContainer/软件管理/Label"]
+offset_left = 240.0
+offset_top = -4.0
+offset_right = 328.0
+offset_bottom = 36.0
+theme_override_font_sizes/font_size = 18
+text = "刷新"
+
+[node name="ItemList_Apps" type="ItemList" parent="Tabs/TabContainer/软件管理"]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = 88.0
+offset_right = 368.0
+offset_bottom = -32.0
+grow_vertical = 2
+theme = ExtResource("2_0xm2m")
+
+[node name="LineEdit_Package" type="LineEdit" parent="Tabs/TabContainer/软件管理"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 384.0
+offset_top = 40.0
+offset_right = -40.0
+offset_bottom = 75.0
+grow_horizontal = 2
+
+[node name="控制台" type="Panel" parent="Tabs/TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="Label" type="Label" parent="Tabs/TabContainer/控制台"]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 40.0
+offset_right = 161.0
+offset_bottom = 67.0
+theme_override_fonts/font = ExtResource("3_h2yge")
+text = "adb shell "
+
+[node name="LineEdit_Shell" type="LineEdit" parent="Tabs/TabContainer/控制台"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 152.0
+offset_top = 36.0
+offset_right = -40.0
+offset_bottom = 71.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("3_h2yge")
+theme_override_font_sizes/font_size = 22
+
+[node name="CodeEdit_Shell" type="CodeEdit" parent="Tabs/TabContainer/控制台"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = 88.0
+offset_right = -40.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_0xm2m")
+theme_override_constants/line_spacing = -1
+editable = false
+emoji_menu_enabled = false
+drag_and_drop_selection_enabled = false
+middle_mouse_paste_enabled = false
+autowrap_mode = 1
+caret_type = 1
+use_default_word_separators = false
+syntax_highlighter = SubResource("CodeHighlighter_h2yge")
+delimiter_strings = Array[String](["\" \"", "' '"])
+
+[node name="ColorRect_NoDevice" type="ColorRect" parent="Tabs"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 352.0
+offset_top = 52.0
+offset_right = -16.0
+offset_bottom = -296.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.364706, 0.364706, 0.364706, 0.376471)
+metadata/_edit_group_ = true
+metadata/_edit_lock_ = true
+
+[node name="Label" type="Label" parent="Tabs/ColorRect_NoDevice"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "请选择一台设备"
+label_settings = SubResource("LabelSettings_0xm2m")
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_lock_ = true
+metadata/_edit_group_ = true
+
+[node name="Button_Test" type="Button" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 352.0
+offset_top = 616.0
+offset_right = 504.0
+offset_bottom = 664.0
+text = "测试"
+
+[connection signal="index_pressed" from="MenuBar/选项" to="." method="_on_menu_选项_index_pressed"]
+[connection signal="pressed" from="Label_ItemList_Devices/Button_ConnectDevice" to="." method="_on_button_connect_device_pressed"]
+[connection signal="pressed" from="Label_ItemList_Devices/Button_RefreshDevices" to="." method="_on_button_refresh_devices_pressed"]
+[connection signal="item_selected" from="ItemList_Devices" to="." method="_on_item_list_devices_item_selected"]
+[connection signal="timeout" from="Timers/Timer_RefreshDevices" to="." method="_on_timer_refresh_devices_timeout"]
+[connection signal="tab_changed" from="Tabs/TabContainer" to="." method="_on_tab_container_tab_changed"]
+[connection signal="pressed" from="Tabs/TabContainer/软件管理/Label/Button_RefreshApps" to="." method="_on_button_refresh_apps_pressed"]
+[connection signal="item_selected" from="Tabs/TabContainer/软件管理/ItemList_Apps" to="." method="_on_item_list_apps_item_selected"]
+[connection signal="text_submitted" from="Tabs/TabContainer/控制台/LineEdit_Shell" to="." method="_on_line_edit_shell_text_submitted"]
+[connection signal="pressed" from="Button_Test" to="." method="_on_button_test_pressed"]

@@ -1,0 +1,31 @@
+[gd_scene load_steps=4 format=3 uid="uid://dwnh26t8ccxug"]
+
+[ext_resource type="Script" uid="uid://bfi7dorxcquvs" path="res://main.gd" id="1_ig7tw"]
+[ext_resource type="Shader" uid="uid://bmgy54tnm2iby" path="res://blur_window.gdshader" id="2_0xm2m"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_h2yge"]
+shader = ExtResource("2_0xm2m")
+shader_parameter/blur_amount = 3.0
+shader_parameter/opacity = 0.8
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ig7tw")
+
+[node name="BlurBuffer" type="BackBufferCopy" parent="."]
+rect = Rect2(0, 0, 1600, 900)
+
+[node name="BlurRect" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_h2yge")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 0.376471)

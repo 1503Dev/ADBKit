@@ -1,0 +1,49 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="ADBKit"
+run/main_scene="uid://dwnh26t8ccxug"
+config/features=PackedStringArray("4.4", "Mobile")
+boot_splash/bg_color=Color(0, 0, 0, 0)
+boot_splash/show_image=false
+boot_splash/fullsize=false
+boot_splash/use_filter=false
+config/icon="res://icon.svg"
+
+[autoload]
+
+Utils="*res://utils.gd"
+Global="*res://global.gd"
+Adb="*res://adb.gd"
+Prompt="*res://popups/prompt.tscn"
+
+[display]
+
+window/size/viewport_width=1504
+window/size/viewport_height=904
+window/size/transparent=true
+window/size/window_width_override=1203
+window/size/window_height_override=723
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/per_pixel_transparency/allowed=true
+window/handheld/orientation=1
+
+[editor]
+
+run/main_run_args="--transparent"
+
+[rendering]
+
+renderer/rendering_method="mobile"
+textures/vram_compression/import_etc2_astc=true
+viewport/transparent_background=true
