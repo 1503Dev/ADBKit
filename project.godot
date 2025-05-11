@@ -12,7 +12,9 @@ config_version=5
 
 config/name="ADBKit"
 run/main_scene="uid://dwnh26t8ccxug"
+run/enable_alt_space_menu=true
 config/features=PackedStringArray("4.4", "Mobile")
+run/max_fps=120
 boot_splash/bg_color=Color(0, 0, 0, 0)
 boot_splash/show_image=false
 boot_splash/fullsize=false
@@ -25,6 +27,8 @@ Utils="*res://utils.gd"
 Global="*res://global.gd"
 Adb="*res://adb.gd"
 Prompt="*res://popups/prompt.tscn"
+Confirm="*res://popups/confirm.tscn"
+Alert="*res://popups/alert.tscn"
 
 [display]
 
@@ -44,6 +48,8 @@ run/main_run_args="--transparent"
 
 [rendering]
 
+textures/canvas_textures/default_texture_filter=0
 renderer/rendering_method="mobile"
-textures/vram_compression/import_etc2_astc=true
+textures/vram_compression/compress_with_gpu=false
+textures/vram_compression/cache_gpu_compressor=false
 viewport/transparent_background=true

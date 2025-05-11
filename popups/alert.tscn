@@ -1,0 +1,67 @@
+[gd_scene load_steps=3 format=3 uid="uid://fheqndn5xcs7"]
+
+[ext_resource type="Script" uid="uid://htsptx772shg" path="res://popups/alert.gd" id="1_kdu0h"]
+[ext_resource type="Theme" uid="uid://qthfj4bhjtkp" path="res://theme.tres" id="2_axj3r"]
+
+[node name="Alert" type="Control"]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_kdu0h")
+metadata/_edit_lock_ = true
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_force_pass_scroll_events = false
+color = Color(0, 0, 0, 0.282353)
+metadata/_edit_lock_ = true
+
+[node name="Window" type="Window" parent="."]
+auto_translate_mode = 1
+initial_position = 1
+size = Vector2i(500, 256)
+exclusive = true
+min_size = Vector2i(440, 256)
+max_size = Vector2i(1280, 720)
+keep_title_visible = true
+theme = ExtResource("2_axj3r")
+
+[node name="Label" type="Label" parent="Window"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -20.0
+offset_bottom = -64.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_axj3r")
+text = "文字"
+autowrap_mode = 3
+
+[node name="Button_OK" type="Button" parent="Window"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -116.0
+offset_top = -56.0
+offset_right = -20.0
+offset_bottom = -16.0
+theme = ExtResource("2_axj3r")
+theme_override_font_sizes/font_size = 20
+text = "确定"
+
+[connection signal="close_requested" from="Window" to="." method="_on_window_close_requested"]
+[connection signal="pressed" from="Window/Button_OK" to="." method="_on_button_ok_pressed"]

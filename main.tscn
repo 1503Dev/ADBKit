@@ -1,8 +1,13 @@
-[gd_scene load_steps=11 format=3 uid="uid://dwnh26t8ccxug"]
+[gd_scene load_steps=18 format=3 uid="uid://dwnh26t8ccxug"]
 
 [ext_resource type="Script" uid="uid://bfi7dorxcquvs" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="Theme" uid="uid://qthfj4bhjtkp" path="res://theme.tres" id="2_0xm2m"]
 [ext_resource type="FontFile" uid="uid://bvq7ykurr2ydp" path="res://fonts/consola.ttf" id="3_h2yge"]
+[ext_resource type="Texture2D" uid="uid://b6ai7c7na3pkc" path="res://icons/arrow_back_2_128dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" id="4_1bvp3"]
+[ext_resource type="Texture2D" uid="uid://dltg2gbeaf7s3" path="res://icons/fiber_manual_record_128dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" id="5_lquwl"]
+[ext_resource type="Texture2D" uid="uid://dk7slffxisasp" path="res://icons/stop_128dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" id="6_7mycd"]
+[ext_resource type="Texture2D" uid="uid://c5fth7v64s773" path="res://icons/menu_128dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" id="7_272bh"]
+[ext_resource type="Texture2D" uid="uid://dqy456i71ktsh" path="res://icons/power_settings_new_128dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" id="8_5vw27"]
 
 [sub_resource type="Shader" id="Shader_ig7tw"]
 code = "// 修改后的着色器（添加透明度支持）
@@ -44,14 +49,24 @@ font_size = 24
 font = ExtResource("3_h2yge")
 font_size = 22
 
-[sub_resource type="CodeHighlighter" id="CodeHighlighter_h2yge"]
+[sub_resource type="LabelSettings" id="LabelSettings_lquwl"]
+font = ExtResource("3_h2yge")
+font_size = 20
+
+[sub_resource type="LabelSettings" id="LabelSettings_0xm2m"]
+font_size = 32
+
+[sub_resource type="CodeHighlighter" id="CodeHighlighter_1bvp3"]
 number_color = Color(0.497766, 0.945313, 0.773287, 1)
 symbol_color = Color(0.701563, 0.969224, 1, 1)
 function_color = Color(0.384841, 0.674607, 0.870313, 1)
 member_variable_color = Color(0.701961, 0.968627, 1, 1)
 
-[sub_resource type="LabelSettings" id="LabelSettings_0xm2m"]
-font_size = 32
+[sub_resource type="CodeHighlighter" id="CodeHighlighter_h2yge"]
+number_color = Color(0.497766, 0.945313, 0.773287, 1)
+symbol_color = Color(0.701563, 0.969224, 1, 1)
+function_color = Color(0.384841, 0.674607, 0.870313, 1)
+member_variable_color = Color(0.701961, 0.968627, 1, 1)
 
 [node name="Main" type="Control"]
 material = SubResource("ShaderMaterial_h2yge")
@@ -65,7 +80,6 @@ script = ExtResource("1_ig7tw")
 metadata/_edit_lock_ = true
 
 [node name="Background" type="ColorRect" parent="."]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -168,6 +182,10 @@ theme = ExtResource("2_0xm2m")
 [node name="Timer_RefreshDevices" type="Timer" parent="Timers"]
 wait_time = 5.0
 autostart = true
+
+[node name="Timer_DelayRefreshDevices" type="Timer" parent="Timers"]
+wait_time = 0.5
+one_shot = true
 
 [node name="Tabs" type="Node" parent="."]
 
@@ -333,6 +351,7 @@ label_settings = SubResource("LabelSettings_h2yge")
 [node name="软件管理" type="Panel" parent="Tabs/TabContainer"]
 layout_mode = 2
 metadata/_tab_index = 1
+metadata/_edit_lock_ = true
 
 [node name="Label" type="Label" parent="Tabs/TabContainer/软件管理"]
 layout_mode = 0
@@ -343,6 +362,7 @@ offset_bottom = 75.0
 text = "软件列表"
 
 [node name="Button_RefreshApps" type="Button" parent="Tabs/TabContainer/软件管理/Label"]
+layout_mode = 0
 offset_left = 240.0
 offset_top = -4.0
 offset_right = 328.0
@@ -367,14 +387,314 @@ anchors_preset = 10
 anchor_right = 1.0
 offset_left = 384.0
 offset_top = 40.0
+offset_right = -136.0
+offset_bottom = 75.0
+grow_horizontal = 2
+caret_blink = true
+
+[node name="Label_For_AppVersion" type="Label" parent="Tabs/TabContainer/软件管理"]
+layout_mode = 0
+offset_left = 384.0
+offset_top = 160.0
+offset_right = 472.0
+offset_bottom = 191.0
+text = "版本"
+
+[node name="Label_AppVersion" type="Label" parent="Tabs/TabContainer/软件管理/Label_For_AppVersion"]
+layout_mode = 0
+offset_left = 104.0
+offset_right = 249.0
+offset_bottom = 31.0
+text = "APP_VERSION"
+label_settings = SubResource("LabelSettings_1bvp3")
+
+[node name="Label_Package" type="Label" parent="Tabs/TabContainer/软件管理"]
+layout_mode = 0
+offset_left = 384.0
+offset_top = 96.0
+offset_right = 472.0
+offset_bottom = 127.0
+theme_override_font_sizes/font_size = 30
+text = "PACKAGE"
+
+[node name="Label_For_ApkPath" type="Label" parent="Tabs/TabContainer/软件管理"]
+layout_mode = 0
+offset_left = 384.0
+offset_top = 200.0
+offset_right = 472.0
+offset_bottom = 231.0
+theme_override_font_sizes/font_size = 0
+text = "APK路径"
+
+[node name="Label_ApkPath" type="Label" parent="Tabs/TabContainer/软件管理"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 488.0
+offset_top = 206.0
+offset_right = -40.0
+offset_bottom = -258.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "APK_PATH"
+label_settings = SubResource("LabelSettings_lquwl")
+autowrap_mode = 2
+
+[node name="HFlowContainer_AppManager" type="HFlowContainer" parent="Tabs/TabContainer/软件管理"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 384.0
+offset_top = 280.0
+offset_right = -40.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Button_LaunchApp" type="Button" parent="Tabs/TabContainer/软件管理/HFlowContainer_AppManager"]
+layout_mode = 2
+text = "  打开  "
+
+[node name="Button_DisableApp" type="Button" parent="Tabs/TabContainer/软件管理/HFlowContainer_AppManager"]
+layout_mode = 2
+text = "  禁用  "
+
+[node name="Button_EnableApp" type="Button" parent="Tabs/TabContainer/软件管理/HFlowContainer_AppManager"]
+layout_mode = 2
+text = "  启用  "
+
+[node name="Button_DownloadApp" type="Button" parent="Tabs/TabContainer/软件管理/HFlowContainer_AppManager"]
+layout_mode = 2
+text = "  下载到本地  "
+
+[node name="Button_ForceStopApp" type="Button" parent="Tabs/TabContainer/软件管理/HFlowContainer_AppManager"]
+layout_mode = 2
+theme_override_colors/font_hover_color = Color(0.835938, 0.672199, 0.0979614, 1)
+theme_override_colors/font_color = Color(0.985937, 0.839804, 0.266511, 1)
+text = "  关闭  "
+
+[node name="Button_KeepUninstallApp2" type="Button" parent="Tabs/TabContainer/软件管理/HFlowContainer_AppManager"]
+layout_mode = 2
+theme_override_colors/font_hover_color = Color(0.876562, 0.472522, 0.472522, 1)
+theme_override_colors/font_color = Color(0.935938, 0.601047, 0.601047, 1)
+text = "  保留数据卸载(慎重)  "
+
+[node name="Button_UninstallApp" type="Button" parent="Tabs/TabContainer/软件管理/HFlowContainer_AppManager"]
+layout_mode = 2
+theme_override_colors/font_hover_color = Color(0.876562, 0.472522, 0.472522, 1)
+theme_override_colors/font_color = Color(0.935938, 0.601047, 0.601047, 1)
+text = "  卸载  "
+
+[node name="ColorRect_NoApp" type="ColorRect" parent="Tabs/TabContainer/软件管理"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 376.0
+offset_top = 88.0
+offset_right = -40.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_default_cursor_shape = 8
+color = Color(0.364706, 0.364706, 0.364706, 0.376471)
+metadata/_edit_group_ = true
+metadata/_edit_lock_ = true
+
+[node name="Label_NoApp" type="Label" parent="Tabs/TabContainer/软件管理/ColorRect_NoApp"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+mouse_force_pass_scroll_events = false
+mouse_default_cursor_shape = 8
+text = "请选择一个软件"
+label_settings = SubResource("LabelSettings_0xm2m")
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_lock_ = true
+metadata/_edit_group_ = true
+
+[node name="Control" type="Control" parent="Tabs/TabContainer/软件管理/ColorRect_NoApp"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_force_pass_scroll_events = false
+mouse_default_cursor_shape = 8
+
+[node name="Button_InstallApp" type="Button" parent="Tabs/TabContainer/软件管理"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -120.0
+offset_top = 38.0
+offset_right = -40.0
+offset_bottom = 77.0
+grow_horizontal = 0
+text = "安装"
+
+[node name="进程" type="Panel" parent="Tabs/TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="Button_RefreshPS" type="Button" parent="Tabs/TabContainer/进程"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -128.0
+offset_top = 40.0
+offset_right = -40.0
+offset_bottom = 79.0
+grow_horizontal = 0
+text = "刷新"
+
+[node name="CodeEdit_PS" type="CodeEdit" parent="Tabs/TabContainer/进程"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -128.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_0xm2m")
+theme_override_constants/line_spacing = -1
+editable = false
+emoji_menu_enabled = false
+drag_and_drop_selection_enabled = false
+middle_mouse_paste_enabled = false
+autowrap_mode = 1
+caret_type = 1
+use_default_word_separators = false
+syntax_highlighter = SubResource("CodeHighlighter_1bvp3")
+
+[node name="输入" type="Panel" parent="Tabs/TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 3
+metadata/_edit_lock_ = true
+
+[node name="Label" type="Label" parent="Tabs/TabContainer/输入"]
+modulate = Color(1, 1, 1, 0.878431)
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -48.0
+offset_right = 232.0
+offset_bottom = -17.0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 20
+text = "↓ 控制按钮，右键为长按"
+
+[node name="Label_For_InputText" type="Label" parent="Tabs/TabContainer/输入"]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 40.0
+offset_right = 128.0
+offset_bottom = 71.0
+text = "输入文字 (仅ASCII无空格)"
+
+[node name="LineEdit_InputText" type="LineEdit" parent="Tabs/TabContainer/输入"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 304.0
+offset_top = 40.0
 offset_right = -40.0
 offset_bottom = 75.0
 grow_horizontal = 2
+keep_editing_on_text_submit = true
+
+[node name="Label_For_InputKey" type="Label" parent="Tabs/TabContainer/输入"]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 104.0
+offset_right = 128.0
+offset_bottom = 135.0
+text = "输入按键"
+
+[node name="TextEdit_InputKey" type="TextEdit" parent="Tabs/TabContainer/输入/Label_For_InputKey"]
+layout_mode = 1
+offset_left = 104.0
+offset_right = 248.0
+offset_bottom = 40.0
+theme_override_font_sizes/font_size = 18
+placeholder_text = "在此输入按键"
+context_menu_enabled = false
+emoji_menu_enabled = false
+shortcut_keys_enabled = false
+selecting_enabled = false
+drag_and_drop_selection_enabled = false
+middle_mouse_paste_enabled = false
+empty_selection_clipboard_enabled = false
+autowrap_mode = 1
+caret_blink = true
+caret_multiple = false
+draw_spaces = true
+
+[node name="Label2" type="Label" parent="Tabs/TabContainer/输入"]
+modulate = Color(1, 1, 1, 0.0784314)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 160.0
+offset_bottom = -72.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 48
+text = "此功能尚未完善，全是Bug"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="快捷功能" type="Panel" parent="Tabs/TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 4
+
+[node name="HFlowContainer" type="HFlowContainer" parent="Tabs/TabContainer/快捷功能"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 40.0
+offset_top = 48.0
+offset_right = -40.0
+offset_bottom = 440.0
+grow_horizontal = 2
+
+[node name="Button_RebootToFastboot2" type="Button" parent="Tabs/TabContainer/快捷功能/HFlowContainer"]
+layout_mode = 2
+text = "  重启  "
+
+[node name="Button_RebootToFastboot" type="Button" parent="Tabs/TabContainer/快捷功能/HFlowContainer"]
+layout_mode = 2
+text = "  重启到 Fastboot  "
+
+[node name="Button_RebootToRecovery" type="Button" parent="Tabs/TabContainer/快捷功能/HFlowContainer"]
+layout_mode = 2
+text = "  重启到 Recovery  "
+
+[node name="Button_Screenshot" type="Button" parent="Tabs/TabContainer/快捷功能/HFlowContainer"]
+layout_mode = 2
+text = "  截图  "
 
 [node name="控制台" type="Panel" parent="Tabs/TabContainer"]
 visible = false
 layout_mode = 2
-metadata/_tab_index = 2
+metadata/_tab_index = 5
 
 [node name="Label" type="Label" parent="Tabs/TabContainer/控制台"]
 layout_mode = 0
@@ -397,16 +717,15 @@ grow_horizontal = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("3_h2yge")
 theme_override_font_sizes/font_size = 22
+keep_editing_on_text_submit = true
+caret_blink = true
 
 [node name="CodeEdit_Shell" type="CodeEdit" parent="Tabs/TabContainer/控制台"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 40.0
 offset_top = 88.0
-offset_right = -40.0
-offset_bottom = -40.0
 grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("2_0xm2m")
@@ -419,7 +738,6 @@ autowrap_mode = 1
 caret_type = 1
 use_default_word_separators = false
 syntax_highlighter = SubResource("CodeHighlighter_h2yge")
-delimiter_strings = Array[String](["\" \"", "' '"])
 
 [node name="ColorRect_NoDevice" type="ColorRect" parent="Tabs"]
 visible = false
@@ -432,6 +750,7 @@ offset_right = -16.0
 offset_bottom = -296.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_default_cursor_shape = 8
 color = Color(0.364706, 0.364706, 0.364706, 0.376471)
 metadata/_edit_group_ = true
 metadata/_edit_lock_ = true
@@ -443,6 +762,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 0
+mouse_force_pass_scroll_events = false
+mouse_default_cursor_shape = 8
 text = "请选择一台设备"
 label_settings = SubResource("LabelSettings_0xm2m")
 horizontal_alignment = 1
@@ -459,13 +781,134 @@ offset_right = 504.0
 offset_bottom = 664.0
 text = "测试"
 
+[node name="Popups" type="Node" parent="."]
+
+[node name="FileDialog_Dir_DownloadApp" type="FileDialog" parent="Popups"]
+transparent_bg = true
+title = "Open a Directory"
+borderless = true
+transparent = true
+ok_button_text = "Select Current Folder"
+dialog_hide_on_ok = true
+cancel_button_text = "取消"
+file_mode = 2
+access = 2
+use_native_dialog = true
+
+[node name="FileDialog_Dir_InstallApp" type="FileDialog" parent="Popups"]
+auto_translate_mode = 1
+transparent_bg = true
+title = "Open a File"
+borderless = true
+transparent = true
+ok_button_text = "Open"
+dialog_hide_on_ok = true
+cancel_button_text = "取消"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.apk,安卓应用程序")
+use_native_dialog = true
+
+[node name="PhysicalButtons" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 352.0
+offset_top = -285.0
+offset_right = 608.0
+offset_bottom = -245.0
+grow_vertical = 0
+metadata/_edit_lock_ = true
+
+[node name="TextureButton_Back" type="TextureButton" parent="PhysicalButtons"]
+modulate = Color(1, 1, 1, 0.878431)
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture_normal = ExtResource("4_1bvp3")
+ignore_texture_size = true
+stretch_mode = 5
+metadata/_edit_lock_ = true
+
+[node name="TextureButton_Home" type="TextureButton" parent="PhysicalButtons"]
+modulate = Color(1, 1, 1, 0.878431)
+layout_mode = 0
+offset_left = 48.0
+offset_right = 88.0
+offset_bottom = 40.0
+texture_normal = ExtResource("5_lquwl")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="TextureButton_AppSwitch" type="TextureButton" parent="PhysicalButtons"]
+modulate = Color(1, 1, 1, 0.878431)
+layout_mode = 0
+offset_left = 98.0
+offset_right = 138.0
+offset_bottom = 40.0
+texture_normal = ExtResource("6_7mycd")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="TextureButton_Menu" type="TextureButton" parent="PhysicalButtons"]
+modulate = Color(1, 1, 1, 0.878431)
+layout_mode = 0
+offset_left = 150.0
+offset_right = 190.0
+offset_bottom = 40.0
+texture_normal = ExtResource("7_272bh")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="TextureButton_Power" type="TextureButton" parent="PhysicalButtons"]
+modulate = Color(1, 1, 1, 0.878431)
+layout_mode = 0
+offset_left = 207.0
+offset_top = 4.0
+offset_right = 239.0
+offset_bottom = 36.0
+texture_normal = ExtResource("8_5vw27")
+ignore_texture_size = true
+stretch_mode = 5
+
 [connection signal="index_pressed" from="MenuBar/选项" to="." method="_on_menu_选项_index_pressed"]
 [connection signal="pressed" from="Label_ItemList_Devices/Button_ConnectDevice" to="." method="_on_button_connect_device_pressed"]
 [connection signal="pressed" from="Label_ItemList_Devices/Button_RefreshDevices" to="." method="_on_button_refresh_devices_pressed"]
 [connection signal="item_selected" from="ItemList_Devices" to="." method="_on_item_list_devices_item_selected"]
 [connection signal="timeout" from="Timers/Timer_RefreshDevices" to="." method="_on_timer_refresh_devices_timeout"]
+[connection signal="timeout" from="Timers/Timer_DelayRefreshDevices" to="." method="_on_timer_delay_refresh_devices_timeout"]
 [connection signal="tab_changed" from="Tabs/TabContainer" to="." method="_on_tab_container_tab_changed"]
 [connection signal="pressed" from="Tabs/TabContainer/软件管理/Label/Button_RefreshApps" to="." method="_on_button_refresh_apps_pressed"]
 [connection signal="item_selected" from="Tabs/TabContainer/软件管理/ItemList_Apps" to="." method="_on_item_list_apps_item_selected"]
+[connection signal="text_submitted" from="Tabs/TabContainer/软件管理/LineEdit_Package" to="." method="_on_line_edit_package_text_submitted"]
+[connection signal="pressed" from="Tabs/TabContainer/软件管理/HFlowContainer_AppManager/Button_LaunchApp" to="." method="_on_button_launch_app_pressed"]
+[connection signal="pressed" from="Tabs/TabContainer/软件管理/HFlowContainer_AppManager/Button_DisableApp" to="." method="_on_button_disable_app_pressed"]
+[connection signal="pressed" from="Tabs/TabContainer/软件管理/HFlowContainer_AppManager/Button_EnableApp" to="." method="_on_button_enable_app_pressed"]
+[connection signal="pressed" from="Tabs/TabContainer/软件管理/HFlowContainer_AppManager/Button_DownloadApp" to="." method="_on_button_download_app_pressed"]
+[connection signal="pressed" from="Tabs/TabContainer/软件管理/HFlowContainer_AppManager/Button_ForceStopApp" to="." method="_on_button_force_stop_app_pressed"]
+[connection signal="pressed" from="Tabs/TabContainer/软件管理/HFlowContainer_AppManager/Button_KeepUninstallApp2" to="." method="_on_button_keep_uninstall_app_2_pressed"]
+[connection signal="pressed" from="Tabs/TabContainer/软件管理/HFlowContainer_AppManager/Button_UninstallApp" to="." method="_on_button_uninstall_app_pressed"]
+[connection signal="pressed" from="Tabs/TabContainer/软件管理/Button_InstallApp" to="." method="_on_button_install_app_pressed"]
+[connection signal="pressed" from="Tabs/TabContainer/进程/Button_RefreshPS" to="." method="_on_button_refresh_ps_pressed"]
+[connection signal="text_submitted" from="Tabs/TabContainer/输入/LineEdit_InputText" to="." method="_on_line_edit_input_text_text_submitted"]
+[connection signal="gui_input" from="Tabs/TabContainer/输入/Label_For_InputKey/TextEdit_InputKey" to="." method="_on_text_edit_input_key_gui_input"]
+[connection signal="text_changed" from="Tabs/TabContainer/输入/Label_For_InputKey/TextEdit_InputKey" to="." method="_on_text_edit_input_key_text_changed"]
+[connection signal="pressed" from="Tabs/TabContainer/快捷功能/HFlowContainer/Button_RebootToFastboot2" to="." method="_on_button_reboot_to_fastboot_2_pressed"]
+[connection signal="pressed" from="Tabs/TabContainer/快捷功能/HFlowContainer/Button_RebootToFastboot" to="." method="_on_button_reboot_to_fastboot_pressed"]
+[connection signal="pressed" from="Tabs/TabContainer/快捷功能/HFlowContainer/Button_RebootToRecovery" to="." method="_on_button_reboot_to_recovery_pressed"]
+[connection signal="pressed" from="Tabs/TabContainer/快捷功能/HFlowContainer/Button_Screenshot" to="." method="_on_button_screenshot_pressed"]
 [connection signal="text_submitted" from="Tabs/TabContainer/控制台/LineEdit_Shell" to="." method="_on_line_edit_shell_text_submitted"]
 [connection signal="pressed" from="Button_Test" to="." method="_on_button_test_pressed"]
+[connection signal="dir_selected" from="Popups/FileDialog_Dir_DownloadApp" to="." method="_on_file_dialog_dir_download_app_dir_selected"]
+[connection signal="file_selected" from="Popups/FileDialog_Dir_InstallApp" to="." method="_on_file_dialog_dir_install_app_file_selected"]
+[connection signal="gui_input" from="PhysicalButtons/TextureButton_Back" to="." method="_on_texture_button_back_gui_input"]
+[connection signal="pressed" from="PhysicalButtons/TextureButton_Back" to="." method="_on_texture_button_back_pressed"]
+[connection signal="gui_input" from="PhysicalButtons/TextureButton_Home" to="." method="_on_texture_button_home_gui_input"]
+[connection signal="pressed" from="PhysicalButtons/TextureButton_Home" to="." method="_on_texture_button_home_pressed"]
+[connection signal="gui_input" from="PhysicalButtons/TextureButton_AppSwitch" to="." method="_on_texture_button_app_switch_gui_input"]
+[connection signal="pressed" from="PhysicalButtons/TextureButton_AppSwitch" to="." method="_on_texture_button_app_switch_pressed"]
+[connection signal="gui_input" from="PhysicalButtons/TextureButton_Menu" to="." method="_on_texture_button_menu_gui_input"]
+[connection signal="pressed" from="PhysicalButtons/TextureButton_Menu" to="." method="_on_texture_button_menu_pressed"]
+[connection signal="gui_input" from="PhysicalButtons/TextureButton_Power" to="." method="_on_texture_button_power_gui_input"]
+[connection signal="pressed" from="PhysicalButtons/TextureButton_Power" to="." method="_on_texture_button_power_pressed"]

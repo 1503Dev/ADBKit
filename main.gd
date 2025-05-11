@@ -19,9 +19,24 @@ extends Control
 @onready var item_list_apps: ItemList = $Tabs/TabContainer/软件管理/ItemList_Apps
 @onready var tab_container: TabContainer = $Tabs/TabContainer
 @onready var line_edit_package: LineEdit = $Tabs/TabContainer/软件管理/LineEdit_Package
+@onready var label_app_version: Label = $Tabs/TabContainer/软件管理/Label_For_AppVersion/Label_AppVersion
+@onready var color_rect_no_app: ColorRect = $Tabs/TabContainer/软件管理/ColorRect_NoApp
+@onready var label_no_app: Label = $Tabs/TabContainer/软件管理/ColorRect_NoApp/Label_NoApp
+@onready var label_apk_path: Label = $Tabs/TabContainer/软件管理/Label_ApkPath
+@onready var timer_delay_refresh_devices: Timer = $Timers/Timer_DelayRefreshDevices
+@onready var h_flow_container_app_manager: HFlowContainer = $Tabs/TabContainer/软件管理/HFlowContainer_AppManager
+@onready var label_package: Label = $Tabs/TabContainer/软件管理/Label_Package
+@onready var file_dialog_dir_download_app: FileDialog = $Popups/FileDialog_Dir_DownloadApp
+@onready var file_dialog_dir_install_app: FileDialog = $Popups/FileDialog_Dir_InstallApp
+@onready var code_edit_ps: CodeEdit = $Tabs/TabContainer/进程/CodeEdit_PS
+@onready var line_edit_input_text: LineEdit = $Tabs/TabContainer/输入/LineEdit_InputText
+@onready var text_edit_input_key: TextEdit = $Tabs/TabContainer/输入/Label_For_InputKey/TextEdit_InputKey
 
 var is_ready := false
 var is_first_refresh_apps:= true
+var is_first_refresh_ps:= true
+var cur_package:= ''
+var cur_apk_path:= ''
 
 func _process(delta: float) -> void:
 	if is_selected():
@@ -30,11 +45,15 @@ func _process(delta: float) -> void:
 	else:
 		color_rect_no_device.show()
 		tab_container.current_tab = 0
+		is_first_refresh_ps = true
 
 func _ready() -> void:
 	init_menu()
 	Adb.node_command_outputs = command_outputs
 	refresh_devices_list()
+	color_rect_no_app.show()
+	h_flow_container_app_manager.hide()
+	command_outputs.clear()
 	is_ready=true
 	
 func refresh_device_static_info():
@@ -76,8 +95,9 @@ func _on_button_connect_device_pressed() -> void:
 	Prompt.make('连接设备', func(value:String):
 		if value.strip_edges() != '':
 			Utils.async_call(func():
-				Adb.run(['connect', value.strip_edges()])
+				Adb.run(['connect', value.strip_edges().replace('：',':').replace('。','.')])
 			)
+			timer_delay_refresh_devices.start()
 	, '输入 IP:端口')
 	pass # Replace with function body.
 
@@ -132,6 +152,7 @@ func _on_line_edit_shell_text_submitted(new_text: String) -> void:
 func _on_item_list_apps_item_selected(index: int) -> void:
 	if index != -1:
 		line_edit_package.text = item_list_apps.get_item_text(index)
+		load_app_info()
 	pass # Replace with function body.
 
 
@@ -156,4 +177,271 @@ func _on_tab_container_tab_changed(tab: int) -> void:
 	if !is_ready: return
 	if tab == 1 && is_first_refresh_apps:
 		refresh_apps_list()
+	if tab == 2 && is_first_refresh_ps:
+		refresh_ps()
+	pass # Replace with function body.
+
+func load_app_info(pkg = line_edit_package.text):
+	pkg = pkg.strip_edges()
+	line_edit_package.text = line_edit_package.text.strip_edges()
+	cur_package = pkg
+	label_package.text = cur_package
+	if pkg.is_empty():
+		color_rect_no_app.show()
+		h_flow_container_app_manager.hide()
+		label_no_app.text = '请选择一个软件'
+		return
+	var apk_path = Adb.get_app_apk_path(pkg)
+	cur_apk_path = apk_path
+	if apk_path.is_empty():
+		color_rect_no_app.show()
+		h_flow_container_app_manager.hide()
+		label_no_app.text = '应用未安装'
+		return
+	color_rect_no_app.hide()
+	h_flow_container_app_manager.show()
+	label_app_version.text = Adb.get_app_version_name(pkg) + ' (' + Adb.get_app_version_code(pkg) + ')'
+	label_apk_path.text = apk_path
+
+
+func _on_line_edit_package_text_submitted(new_text: String) -> void:
+	load_app_info()
+	pass # Replace with function body.
+
+
+func _on_button_uninstall_app_pressed() -> void:
+	if cur_package.to_lower().strip_edges() == 'android':
+		Alert.make('禁止卸载 Framework')
+		return
+	var text = '是否卸载 ' + cur_package
+	if Adb.is_app_system(cur_apk_path):
+		text = cur_package + ' 为系统应用，是否卸载'
+	Confirm.make(text, func():
+		var rez = Adb.adb(['uninstall', '--user', '0', cur_package])
+		if rez == 'Success':
+			Alert.make('卸载成功')
+		else:
+			Alert.make(rez, '卸载失败')
+		Adb.remove_package_info(cur_package)
+		load_app_info(cur_package)
+		refresh_apps_list()
+	)
+	pass # Replace with function body.
+
+
+func _on_timer_delay_refresh_devices_timeout() -> void:
+	refresh_devices_list()
+	pass # Replace with function body.
+
+
+func _on_button_keep_uninstall_app_2_pressed() -> void:
+	if cur_package.to_lower().strip_edges() == 'android':
+		Alert.make('禁止卸载 Framework')
+		return
+	var text = '是否卸载 ' + cur_package + ' 并保留数据，请谨慎选择'
+	if Adb.is_app_system(cur_apk_path):
+		text = cur_package + ' 为系统应用，是否卸载' + '并保留数据，请谨慎选择'
+	Confirm.make(text, func():
+		var rez = Adb.shell('cmd package uninstall -k ' + cur_package)
+		if rez == 'Success':
+			Alert.make('卸载成功')
+		else:
+			Alert.make(rez, '卸载失败')
+		Adb.remove_package_info(cur_package)
+		load_app_info(cur_package)
+		refresh_apps_list()
+	)
+	pass # Replace with function body.
+
+
+func _on_button_disable_app_pressed() -> void:
+	if cur_package.to_lower().strip_edges() == 'android':
+		Alert.make('禁止禁用 Framework')
+		return
+	var rez = Adb.shell('pm disable-user ' + cur_package)
+	Alert.make('部分系统软件被禁用后重启会变砖，如有需要请及时恢复\n'+rez, '禁用成功')
+	pass # Replace with function body.
+
+
+func _on_button_enable_app_pressed() -> void:
+	var rez = Adb.shell('pm enable ' + cur_package)
+	Alert.make(rez, '启用成功')
+	pass # Replace with function body.
+
+
+func _on_button_launch_app_pressed() -> void:
+	var rez:= Adb.shell('monkey -p ' + cur_package + ' -c android.intent.category.LAUNCHER 1')
+	if rez.contains('monkey aborted'):
+		var split:= rez.split('\n')
+		var reson:= split[split.size() - 1]
+		if reson.contains('No activities'): reson = '找不到启动活动'
+		Alert.make(reson, '启动失败')
+	pass # Replace with function body.
+
+
+func _on_button_download_app_pressed() -> void:
+	file_dialog_dir_download_app.popup()
+	pass # Replace with function body.
+
+
+func _on_file_dialog_dir_download_app_dir_selected(dir: String) -> void:
+	var apk_name:= cur_apk_path.split('/')[cur_apk_path.split('/').size() - 1]
+	if FileAccess.file_exists(dir + '/' + apk_name):
+		Alert.make('文件 ' + apk_name + ' 已存在')
+	else:
+		Adb.pull(cur_apk_path, dir)
+	pass # Replace with function body.
+
+
+func _on_button_install_app_pressed() -> void:
+	file_dialog_dir_install_app.popup()
+	pass # Replace with function body.
+
+func _on_file_dialog_dir_install_app_file_selected(path: String) -> void:
+	var rez:= Adb.adb(['install', path])
+	if rez.contains('Success'):
+		Alert.make('安装成功')
+	else:
+		Alert.make(rez, '安装结果')
+	pass # Replace with function body.
+
+
+func _on_button_force_stop_app_pressed() -> void:
+	var text = '是否终止 ' + cur_package
+	Confirm.make(text, func():
+		Adb.force_stop(cur_package)
+	)
+	pass # Replace with function body.
+
+func refresh_ps():
+	is_first_refresh_ps = false
+	code_edit_ps.text = '\n'.join(Adb.get_ps())
+
+
+func _on_button_refresh_ps_pressed() -> void:
+	refresh_ps()
+	pass # Replace with function body.
+
+
+func _on_texture_button_back_pressed() -> void:
+	if is_selected():
+		Adb.press('KEYCODE_BACK')
+	pass # Replace with function body.
+
+
+func _on_texture_button_home_pressed() -> void:
+	if is_selected():
+		Adb.press('KEYCODE_HOME')
+	pass # Replace with function body.
+
+
+func _on_texture_button_app_switch_pressed() -> void:
+	if is_selected():
+		Adb.press('KEYCODE_APP_SWITCH')
+	pass # Replace with function body.
+
+
+func _on_texture_button_menu_pressed() -> void:
+	if is_selected():
+		Adb.press('KEYCODE_MENU')
+	pass # Replace with function body.
+
+
+func _on_texture_button_power_pressed() -> void:
+	if is_selected():
+		Adb.press('KEYCODE_POWER')
+	pass # Replace with function body.
+
+
+func _on_texture_button_back_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and is_selected():
+		if event.button_index == MOUSE_BUTTON_RIGHT and event.is_released():
+			Adb.press_long('KEYCODE_BACK')
+			accept_event()
+	pass # Replace with function body.
+
+
+func _on_texture_button_home_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and is_selected():
+		if event.button_index == MOUSE_BUTTON_RIGHT and event.is_released():
+			Adb.press_long('KEYCODE_HOME')
+			accept_event()
+	pass # Replace with function body.
+
+
+func _on_texture_button_app_switch_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and is_selected():
+		if event.button_index == MOUSE_BUTTON_RIGHT and event.is_released():
+			Adb.press_long('KEYCODE_APP_SWITCH')
+			accept_event()
+	pass # Replace with function body.
+
+
+func _on_texture_button_menu_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and is_selected():
+		if event.button_index == MOUSE_BUTTON_RIGHT and event.is_released():
+			Adb.press_long('KEYCODE_MENU')
+			accept_event()
+	pass # Replace with function body.
+
+
+func _on_texture_button_power_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and is_selected():
+		if event.button_index == MOUSE_BUTTON_RIGHT and event.is_released():
+			Adb.press_long('KEYCODE_POWER')
+			accept_event()
+	pass # Replace with function body.
+
+
+func _on_line_edit_input_text_text_submitted(new_text: String) -> void:
+	Adb.input(new_text)
+	line_edit_input_text.clear()
+	pass # Replace with function body.
+
+
+func _on_text_edit_input_key_text_changed() -> void:
+	Adb.input(text_edit_input_key.text)
+	text_edit_input_key.clear()
+	pass # Replace with function body.
+
+
+func _on_text_edit_input_key_gui_input(event: InputEvent) -> void:
+	if event is InputEventKey and is_selected():
+		var is_accept_event:= true
+		if event.keycode == KEY_BACKSPACE and event.is_pressed():
+			Adb.press('KEYCODE_DEL')
+		elif event.keycode == KEY_ENTER and event.is_pressed():
+			Adb.press('KEYCODE_ENTER')
+		elif event.keycode == KEY_SHIFT and event.is_released():
+			Adb.press('KEYCODE_SHIFT_LEFT')
+		elif event.keycode == KEY_SPACE and event.is_pressed():
+			Adb.press('KEYCODE_SPACE')
+		else: is_accept_event = false
+		if is_accept_event: accept_event()
+	pass # Replace with function body.
+
+
+func _on_button_reboot_to_fastboot_pressed() -> void:
+	Adb.adb_async(['reboot', 'bootloader'])
+	pass # Replace with function body.
+
+
+func _on_button_reboot_to_recovery_pressed() -> void:
+	Adb.adb_async(['reboot', 'recovery'])
+	pass # Replace with function body.
+
+func _on_button_reboot_to_fastboot_2_pressed() -> void:
+	Adb.adb_async(['reboot'])
+	pass # Replace with function body.
+
+
+func _on_button_screenshot_pressed() -> void:
+	Input.set_default_cursor_shape(Input.CURSOR_BUSY)
+	var uuid:= Utils.generate_uuid_v4()
+	var path:= '/sdcard/adbkit_screenshot_' + uuid + '.png'
+	Adb.shell('screencap -p ' + path)
+	Adb.pull(path, OS.get_cache_dir())
+	Adb.shell('rm ' + path)
+	OS.shell_open(OS.get_cache_dir() + '/adbkit_screenshot_' + uuid + '.png')
+	Input.set_default_cursor_shape(Input.CURSOR_ARROW)
 	pass # Replace with function body.

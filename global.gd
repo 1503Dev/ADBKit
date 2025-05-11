@@ -17,7 +17,9 @@ Este programa solo puede ejecutarse en Windows x64
 
 यह प्रोग्राम केवल Windows x64 पर चल सकता है।', 'Warning')
 		get_tree().quit()
+		return
 	
+	get_window().title += ' v0.1.0'
 	print('User dir: ' + OS.get_user_data_dir())
 	
 	if(DirAccess.dir_exists_absolute(DIR_BIN)):

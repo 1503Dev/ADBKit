@@ -1,9 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://bnlq5fjg2uj7y"]
+[gd_scene load_steps=3 format=3 uid="uid://dqatac46o71hk"]
 
-[ext_resource type="Script" uid="uid://b2rn1g7o7ndy" path="res://popups/prompt.gd" id="1_w6hi4"]
-[ext_resource type="Theme" uid="uid://qthfj4bhjtkp" path="res://theme.tres" id="2_s05b4"]
+[ext_resource type="Script" uid="uid://b52w2f4hern1l" path="res://popups/confirm.gd" id="1_qowxr"]
+[ext_resource type="Theme" uid="uid://qthfj4bhjtkp" path="res://theme.tres" id="2_a7qlx"]
 
-[node name="Prompt" type="Control"]
+[node name="Confirm" type="Control"]
 process_mode = 3
 layout_mode = 3
 anchors_preset = 15
@@ -11,7 +11,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_w6hi4")
+script = ExtResource("1_qowxr")
 metadata/_edit_lock_ = true
 
 [node name="ColorRect" type="ColorRect" parent="."]
@@ -34,30 +34,23 @@ unresizable = true
 min_size = Vector2i(400, 184)
 max_size = Vector2i(400, 184)
 keep_title_visible = true
-theme = ExtResource("2_s05b4")
-
-[node name="TextEdit" type="TextEdit" parent="Window"]
-offset_left = 16.0
-offset_top = 64.0
-offset_right = 384.0
-offset_bottom = 112.0
-theme = ExtResource("2_s05b4")
-autowrap_mode = 1
+theme = ExtResource("2_a7qlx")
 
 [node name="Label" type="Label" parent="Window"]
 offset_left = 16.0
 offset_top = 16.0
 offset_right = 384.0
-offset_bottom = 48.0
-theme = ExtResource("2_s05b4")
-text = "输入文字"
+offset_bottom = 120.0
+theme = ExtResource("2_a7qlx")
+text = "文字"
+autowrap_mode = 3
 
 [node name="Button_Cancel" type="Button" parent="Window"]
 offset_left = 184.0
 offset_top = 128.0
 offset_right = 280.0
 offset_bottom = 168.0
-theme = ExtResource("2_s05b4")
+theme = ExtResource("2_a7qlx")
 theme_override_font_sizes/font_size = 20
 text = "取消"
 
@@ -66,9 +59,9 @@ offset_left = 288.0
 offset_top = 128.0
 offset_right = 384.0
 offset_bottom = 168.0
-theme = ExtResource("2_s05b4")
+theme = ExtResource("2_a7qlx")
 theme_override_font_sizes/font_size = 20
-text = "提交"
+text = "确定"
 
 [connection signal="close_requested" from="Window" to="." method="_on_window_close_requested"]
 [connection signal="pressed" from="Window/Button_Cancel" to="." method="_on_button_cancel_pressed"]

@@ -7,6 +7,7 @@ var node_command_outputs:CodeEdit
 var device:= ''
 var prop:= {}
 var cpuinfo:= {}
+var package_info:= {}
 
 func run(args:Array = []) -> String:
 	var rez = Utils.exec_d(bin, args)
@@ -21,6 +22,9 @@ func run(args:Array = []) -> String:
 
 func shell(cmd:String, _device:String = device) -> String:
 	return run(['-s', _device, 'shell',  cmd])
+
+func adb(args:Array = [], _device:String = device) -> String:
+	return run(['-s', _device] + args)
 #
 #func shell_and_find(cmd:String, find:String, _device:String = device) -> String:
 	#return run(['-s', _device, 'shell',  cmd, ''])
@@ -104,3 +108,66 @@ func get_apps()->Array:
 			if split.size() > 1:
 				rez.push_back(split[1])
 	return rez
+
+func get_package_info(pkg):
+	if !package_info.has(device):
+		package_info[device] = {
+			pkg: shell('dumpsys package '+pkg)
+		}
+	elif !package_info[device].has(pkg):
+		package_info[device][pkg] = shell('dumpsys package '+pkg)
+	return package_info[device][pkg]
+
+func remove_package_info(pkg):
+	if package_info.has(device) and package_info[device].has(pkg):
+		package_info[device].erase(pkg)
+
+func get_app_version_name(pkg):
+	var pkg_info = get_package_info(pkg)
+	return Utils.findstr(pkg_info, 'versionName').strip_edges().split('=')[1]
+
+func get_app_version_code(pkg):
+	var pkg_info = get_package_info(pkg)
+	return Utils.findstr(pkg_info, 'versionCode').strip_edges().split('=')[1].split(' ')[0]
+
+func get_app_apk_path(pkg):
+	var rez = shell('pm path ' + pkg)
+	if rez.is_empty(): return ''
+	return rez.split('package:')[1]
+
+func is_app_system(path:String):
+	if path.begins_with('/system') or path.begins_with('/apex'): return true
+	return false
+
+func pull(path, local_path):
+	return adb(['pull', path, local_path])
+
+func get_ps() -> Array:
+	var ori:= shell('ps').split('\n')
+	var rez:= []
+	for line in ori:
+		if (line.contains('.') and !line.contains('[') and !line.contains('@')) or ori[0] == line:
+			rez.push_back(line.replace('USER', '用户').replace('RSS', '内存').replace('NAME', '包名'))
+	return rez
+
+func force_stop(pkg):
+	return shell('am force-stop ' + pkg)
+
+func shell_async(cmd:String, _device:String = device):
+	Utils.async_call(func():
+		run(['-s', _device, 'shell',  cmd])
+	)
+
+func adb_async(args:Array = [], _device:String = device):
+	Utils.async_call(func():
+		run(['-s', _device] + args)
+	)
+
+func press(key):
+	shell_async('input keyevent ' + key)
+
+func press_long(key):
+	shell_async('input keyevent --longpress ' + key)
+
+func input(text):
+	shell_async('input text "' + text + '"')
